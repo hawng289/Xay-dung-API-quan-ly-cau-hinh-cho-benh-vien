@@ -1,4 +1,4 @@
-package vn.itechcorp.ris.module;
+package vn.itechcorp.admin.jpa.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.com.itechcorp.base.persistence.model.BaseDbEntry;
 import vn.com.itechcorp.base.persistence.model.BaseSerialIDEntry;
-import vn.com.itechcorp.base.persistence.model.interfaces.BaseEntity;
-import vn.itechcorp.admin.jpa.entity.ConfigAttribute;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,11 +16,10 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class HospitalConfig extends BaseSerialIDEntry {
+
+public class HospitalConfig extends BaseDbEntry<Long> {
 
     private static final long serialVersionUID = 1L;
-
 
     @Column(name = "attribute_id", nullable = false)
     private String attributeId;
@@ -35,5 +33,11 @@ public class HospitalConfig extends BaseSerialIDEntry {
     @Column(name = "hospital_id")
     private  String hospitalId;
 
+    public HospitalConfig(Long id){
+        super(id);
+    }
+    public HospitalConfig() {
+        
+    }
 
 }

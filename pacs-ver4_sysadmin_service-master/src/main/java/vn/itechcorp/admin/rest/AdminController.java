@@ -24,18 +24,12 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/sysadmin/ws/rest/v1")
 public class AdminController {
 
-
     private final AsyncBaseDtoAPIMethod<ConfigAttributeDTOGet, ConfigAttribute, String> configAttributeAPIMethod;
-
-
 
     public AdminController(AsyncBaseDtoAPIMethod<ConfigAttributeDTOGet, ConfigAttribute, String> configAttributeAPIMethod)
     {
-
         this.configAttributeAPIMethod = configAttributeAPIMethod;
-
     }
-
 
 
     @ApiOperation(value = "View a list of config attributes")

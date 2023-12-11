@@ -3,6 +3,8 @@ package vn.itechcorp.admin.service;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import vn.com.itechcorp.base.exception.APIException;
 import vn.com.itechcorp.base.service.dto.DtoUpdate;
@@ -10,11 +12,18 @@ import vn.com.itechcorp.base.service.impl.BaseDtoJpaServiceImpl;
 import vn.itechcorp.admin.jpa.ConfigAttributeRepository;
 import vn.itechcorp.admin.jpa.entity.ConfigAttribute;
 import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
+import vn.itechcorp.admin.service.dto.HospitalConfigDTOCreate;
+
+import javax.annotation.PostConstruct;
 
 @Service("configAttributeService")
 public class ConfigAttributeServiceImpl extends BaseDtoJpaServiceImpl<ConfigAttributeDTOGet, ConfigAttribute, String> implements ConfigAttributeService {
 
     private final ConfigAttributeRepository configAttributeRepository;
+    @PostConstruct
+    private void post(){
+        HospitalConfigDTOCreate.setConfigAttributeService(this);
+    }
 
     public ConfigAttributeServiceImpl(ConfigAttributeRepository configAttributeRepository) {
         this.configAttributeRepository = configAttributeRepository;

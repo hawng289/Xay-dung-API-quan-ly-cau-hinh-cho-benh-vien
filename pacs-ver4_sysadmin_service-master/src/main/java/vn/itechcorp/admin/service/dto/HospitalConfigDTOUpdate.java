@@ -1,39 +1,35 @@
-package vn.itechcorp.ris.dto;
+package vn.itechcorp.admin.service.dto;
 
-import lombok.*;
-import vn.com.itechcorp.base.service.dto.DtoCreate;
+import lombok.NonNull;
+import vn.com.itechcorp.base.service.dto.DtoUpdate;
+
 import vn.itechcorp.admin.service.ConfigAttributeService;
-import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
-import vn.itechcorp.ris.module.HospitalConfig;
-import vn.itechcorp.ris.service.HospitalConfigSer;
 
+import vn.itechcorp.admin.jpa.entity.HospitalConfig;
+import vn.itechcorp.admin.service.HospitalConfigService;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
-
-
+public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
     private String attributeId;
 
     @NonNull
     private String attributeValue;
+    private ConfigAttributeService configAttributeService;
 
-    private  Boolean preferred;
+    private Boolean preferred;
 
     @NonNull
-    private  String hospitalId;
-    private ConfigAttributeService configAttributeService;
-    private HospitalConfigSer hospitalConfigSer;
+    private String hospitalId;
+
+    private ConfigAttributeDTOGet configAttributeDTOGet = new ConfigAttributeDTOGet();
+    private HospitalConfigService hospitalConfigSer;
 
     @Override
-    public HospitalConfig toEntry() {
-        if (attributeValue == null) {
-            return null;
-        }
+    public boolean apply(HospitalConfig hospitalConfig) {
+
+        // Check null
+
         if (hospitalId == null) {
-            return null;
+            return false;
         }
 
         if (preferred == null) {
@@ -41,7 +37,7 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
         }
 
         if (attributeValue != null) {
-            return null;
+            return false;
         }
         if (configAttributeService != null) {
             ConfigAttributeDTOGet configAttribute = configAttributeService.getById(attributeId);
@@ -73,11 +69,12 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
             }
             Integer maxOccurs = configAttribute.getMaxOccurs();
             if (hospitalConfigSer.findAllByAttributeId(attributeId) >= maxOccurs) {
-                return null;
+                return false;
             }
 
         }
+        return true;
 
-        return new HospitalConfig(attributeId, attributeValue, preferred, hospitalId);
     }
+
 }

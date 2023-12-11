@@ -1,46 +1,52 @@
-package vn.itechcorp.ris.dto;
+package vn.itechcorp.admin.service.dto;
 
+import lombok.Getter;
 import lombok.NonNull;
-import vn.com.itechcorp.base.service.dto.DtoUpdate;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import vn.com.itechcorp.base.service.dto.DtoCreate;
+import vn.itechcorp.admin.jpa.entity.HospitalConfig;
+import vn.itechcorp.admin.service.ConfigAttributeServiceImpl;
+import vn.itechcorp.admin.service.HospitalConfigSerImp;
 
-import vn.itechcorp.admin.service.ConfigAttributeService;
+@Service("toCreate")
+@Getter
+@Setter
+public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
 
-import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
-
-import vn.itechcorp.ris.module.HospitalConfig;
-import vn.itechcorp.ris.service.HospitalConfigSer;
-
-public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
     private String attributeId;
 
     @NonNull
     private String attributeValue;
-    private ConfigAttributeService configAttributeService;
 
-    private Boolean preferred;
+    private  Boolean preferred;
 
     @NonNull
-    private String hospitalId;
+    private  String hospitalId;
 
-    private ConfigAttributeDTOGet configAttributeDTOGet = new ConfigAttributeDTOGet();
-    private HospitalConfigSer hospitalConfigSer;
+    private static ConfigAttributeServiceImpl configAttributeService = null;
+
+    private static HospitalConfigSerImp hospitalConfigSer = null;
+
+    public static void setHospitalConfigSer(HospitalConfigSerImp hospitalConfigSer1 ) {
+        hospitalConfigSer = hospitalConfigSer1;
+    }
+
+    public static void setConfigAttributeService(ConfigAttributeServiceImpl configAttributeService1 ) {
+        configAttributeService = configAttributeService1;
+    }
+
+
 
     @Override
-    public boolean apply(HospitalConfig hospitalConfig) {
-
-        // Check null
-
-        if (hospitalId == null) {
-            return false;
-        }
+    public HospitalConfig toEntry() {
+        System.out.println(configAttributeService);
 
         if (preferred == null) {
             preferred = true;
         }
 
-        if (attributeValue != null) {
-            return false;
-        }
         if (configAttributeService != null) {
             ConfigAttributeDTOGet configAttribute = configAttributeService.getById(attributeId);
             String type = configAttribute.getDatatype();
@@ -71,12 +77,20 @@ public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
             }
             Integer maxOccurs = configAttribute.getMaxOccurs();
             if (hospitalConfigSer.findAllByAttributeId(attributeId) >= maxOccurs) {
-                return false;
+                System.err.println("Qua so luong");
+                return null;
             }
 
         }
-        return true;
+        HospitalConfig object = new HospitalConfig();
+        object.setId(getId());
+        object.setAttributeId(attributeId);
+        object.setPreferred(preferred);
+        object.setHospitalId(hospitalId);
+        object.setAttributeValue(attributeValue);
+        System.out.println(object);
 
+
+        return object;
     }
-
 }

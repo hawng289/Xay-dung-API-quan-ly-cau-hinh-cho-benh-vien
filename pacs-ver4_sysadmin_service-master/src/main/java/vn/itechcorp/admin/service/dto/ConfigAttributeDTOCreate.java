@@ -1,5 +1,6 @@
 package vn.itechcorp.admin.service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ConfigAttributeDTOCreate extends DtoCreate<ConfigAttribute, String> {
 
     private static final long serialVersionUID = 1L;

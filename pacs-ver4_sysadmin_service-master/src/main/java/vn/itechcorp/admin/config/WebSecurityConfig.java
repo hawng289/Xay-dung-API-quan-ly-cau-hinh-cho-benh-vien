@@ -28,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator*/**", "/webjars*/**", "/v2/api-docs/**").permitAll()
                 .antMatchers("/swagger*/**").permitAll()
                 .antMatchers("/ws/rest/v1/**").permitAll()
+                .antMatchers("/v1/hospitalconfig/**/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

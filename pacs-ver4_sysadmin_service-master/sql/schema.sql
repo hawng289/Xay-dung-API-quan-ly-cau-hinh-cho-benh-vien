@@ -88,3 +88,18 @@ create table gb_client
     ip_allowed        text,
     hospital_id       varchar(16) references gb_hospital (id)
 );
+INSERT INTO gb_config_attribute (id, name, description, datatype, datatype_config, min_occurs, max_occurs)
+VALUES ('003', 'ngo', 'hang', 'INTEGER', '', 0, 2);
+INSERT INTO gb_hospital (id, name, name_search, description, phone, email, address, enabled)
+VALUES ('001', 'bvtinh', 'tinhqn', 'BOOLEAN', '097', 'h@gmai.com', 'hf', true);
+create table gb_hospital_config(
+
+                                   id                serial primary key,
+
+                                   attribute_id      varchar(64) NOT NULL references gb_config_attribute (id),
+
+                                   attribute_value   text not null,
+
+                                   preferred         boolean not null default true,
+
+                                   hospital_id       varchar(16) NOT NULL references gb_hospital (id));
