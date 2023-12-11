@@ -1,4 +1,4 @@
-package com.example.demo.ris.module;
+package vn.itechcorp.ris.module;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

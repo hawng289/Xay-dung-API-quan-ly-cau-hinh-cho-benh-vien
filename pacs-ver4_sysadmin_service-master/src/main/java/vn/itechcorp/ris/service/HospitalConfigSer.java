@@ -1,13 +1,17 @@
-package com.example.demo.ris.service;
+package vn.itechcorp.ris.service;
 
-import com.example.demo.ris.dto.HospitalConfigDTOGet;
-import com.example.demo.ris.module.HospitalConfig;
+
+
+import org.springframework.stereotype.Service;
 import vn.com.itechcorp.base.persistence.repository.BaseRepository;
-import vn.com.itechcorp.base.service.BaseDtoService;
 import vn.com.itechcorp.base.service.impl.BaseDtoJpaServiceImpl;
-import com.example.demo.ris.repo.HospitalConfigRepo;
+import vn.itechcorp.ris.dto.HospitalConfigDTOGet;
+import vn.itechcorp.ris.module.HospitalConfig;
+import vn.itechcorp.ris.repo.HospitalConfigRepo;
 
-public class HospitalConfigSer extends BaseDtoJpaServiceImpl<com.example.demo.ris.dto.HospitalConfigDTOGet, com.example.demo.ris.module.HospitalConfig, Long> {
+import java.util.List;
+@Service
+public class HospitalConfigSer extends BaseDtoJpaServiceImpl<HospitalConfigDTOGet, HospitalConfig, Long> {
    HospitalConfigRepo hospitalConfigRepo;
     @Override
     public BaseRepository<HospitalConfig, Long> getRepository() {
@@ -22,7 +26,14 @@ public class HospitalConfigSer extends BaseDtoJpaServiceImpl<com.example.demo.ri
     }
 
     public int findAllByAttributeId(String attributeId) {
-
-        return hospitalConfigRepo.findAll
+        List<HospitalConfig> list = hospitalConfigRepo.findAll();
+        int count = 0;
+        for (HospitalConfig item: list) {
+            if (item.getAttributeId()   != null && item.getAttributeId().equals(attributeId)) {
+                count++;
+            }
+        }
+        return count;
     }
+
 }

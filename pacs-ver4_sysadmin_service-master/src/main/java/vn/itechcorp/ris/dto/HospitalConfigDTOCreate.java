@@ -1,12 +1,11 @@
 package vn.itechcorp.ris.dto;
 
-
-
-import com.example.demo.ris.module.HospitalConfig;
 import lombok.*;
 import vn.com.itechcorp.base.service.dto.DtoCreate;
 import vn.itechcorp.admin.service.ConfigAttributeService;
 import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
+import vn.itechcorp.ris.module.HospitalConfig;
+import vn.itechcorp.ris.service.HospitalConfigSer;
 
 
 @Getter
@@ -26,9 +25,24 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
     @NonNull
     private  String hospitalId;
     private ConfigAttributeService configAttributeService;
+    private HospitalConfigSer hospitalConfigSer;
 
     @Override
     public HospitalConfig toEntry() {
+        if (attributeValue == null) {
+            return null;
+        }
+        if (hospitalId == null) {
+            return null;
+        }
+
+        if (preferred == null) {
+            preferred = true;
+        }
+
+        if (attributeValue != null) {
+            return null;
+        }
         if (configAttributeService != null) {
             ConfigAttributeDTOGet configAttribute = configAttributeService.getById(attributeId);
             String type = configAttribute.getDatatype();
@@ -58,7 +72,9 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
                 }
             }
             Integer maxOccurs = configAttribute.getMaxOccurs();
-
+            if (hospitalConfigSer.findAllByAttributeId(attributeId) >= maxOccurs) {
+                return null;
+            }
 
         }
 

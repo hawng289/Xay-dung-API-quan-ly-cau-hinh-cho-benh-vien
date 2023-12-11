@@ -1,27 +1,30 @@
-package com.example.demo.ris.dto;
+package vn.itechcorp.ris.dto;
 
-import com.example.demo.ris.module.HospitalConfig;
 import lombok.NonNull;
 import vn.com.itechcorp.base.service.dto.DtoUpdate;
-import vn.itechcorp.admin.jpa.entity.ConfigAttribute;
+
 import vn.itechcorp.admin.service.ConfigAttributeService;
-import vn.itechcorp.admin.service.dto.ConfigAttributeDTOCreate;
+
 import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
-import vn.itechcorp.admin.service.dto.ConfigAttributeDTOUpdate;
+
+import vn.itechcorp.ris.module.HospitalConfig;
+import vn.itechcorp.ris.service.HospitalConfigSer;
 
 public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
     private String attributeId;
 
     @NonNull
-    private ConfigAttribute attributeValue;
+    private String attributeValue;
     private ConfigAttributeService configAttributeService;
 
-    private  Boolean preferred;
+    private Boolean preferred;
 
     @NonNull
-    private  String hospitalId;
+    private String hospitalId;
 
     private ConfigAttributeDTOGet configAttributeDTOGet = new ConfigAttributeDTOGet();
+    private HospitalConfigSer hospitalConfigSer;
+
     @Override
     public boolean apply(HospitalConfig hospitalConfig) {
 
@@ -38,7 +41,42 @@ public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
         if (attributeValue != null) {
             return false;
         }
+        if (configAttributeService != null) {
+            ConfigAttributeDTOGet configAttribute = configAttributeService.getById(attributeId);
+            String type = configAttribute.getDatatype();
+            if (type != null) {
+                if (type.equals("BOOLEAN")) {
+                    if (attributeValue.trim().toLowerCase().equals("true")) {
+                        attributeValue = "true";
+                    } else {
+                        attributeValue = "false";
+                    }
+                }
+                if (type.equals("INT") || type.equals("INTEGER")) {
+                    try {
+                        attributeValue = Integer.parseInt(attributeValue) + "";
+                    } catch (NumberFormatException e) {
+                        System.err.println("attributeValue phai la dang int");
+                    }
 
+                }
+                if (type.equals("DOUBLE") || type.equals("FLOAT") || type.equals("REAL")) {
+                    try {
+                        attributeValue = Double.parseDouble(attributeValue) + "";
+                    } catch (NumberFormatException e) {
+                        System.err.println("attributeValue phai la dang so thuc");
+                    }
+
+                }
+            }
+            Integer maxOccurs = configAttribute.getMaxOccurs();
+            if (hospitalConfigSer.findAllByAttributeId(attributeId) >= maxOccurs) {
+                return false;
+            }
+
+        }
+        return true;
 
     }
+
 }
