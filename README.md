@@ -1,1 +1,1 @@
-# X-y-d-ng-API-qu-n-l-c-u-h-nh-cho-b-nh-vi-n
+# Xây dựng API quản lý cấu hình cho bệnh viện
