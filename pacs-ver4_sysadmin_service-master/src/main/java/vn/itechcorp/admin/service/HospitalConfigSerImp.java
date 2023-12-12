@@ -7,20 +7,25 @@ import vn.com.itechcorp.base.service.dto.BaseDtoCreate;
 import vn.com.itechcorp.base.service.dto.DtoUpdate;
 import vn.com.itechcorp.base.service.impl.BaseDtoJpaServiceImpl;
 
+import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
 import vn.itechcorp.admin.service.dto.HospitalConfigDTOCreate;
 import vn.itechcorp.admin.service.dto.HospitalConfigDTOGet;
 import vn.itechcorp.admin.jpa.entity.HospitalConfig;
 import vn.itechcorp.admin.jpa.HospitalConfigRepo;
+import vn.itechcorp.admin.service.dto.HospitalConfigDTOUpdate;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
+
 @Service("HospitalConfigSerImp")
-public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDTOGet, HospitalConfig, Long> implements HospitalConfigService{
+public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDTOGet, HospitalConfig, Long> implements HospitalConfigService {
 
     private final HospitalConfigRepo hospitalConfigRepo;
     @Autowired
-    public HospitalConfigSerImp(HospitalConfigRepo hospitalConfigRepo) {
+    private final ConfigAttributeService configAttributeService;
+
+    public HospitalConfigSerImp(HospitalConfigRepo hospitalConfigRepo, ConfigAttributeServiceImpl configAttributeService) {
         this.hospitalConfigRepo = hospitalConfigRepo;
+        this.configAttributeService = configAttributeService;
     }
 
     @Override
@@ -29,11 +34,11 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
     }
 
     @Override
-        public int findAllByAttributeId(String attributeId) {
+    public int findAllByAttributeId(String attributeId) {
         List<HospitalConfig> list = hospitalConfigRepo.findAll();
         int count = 0;
-        for (HospitalConfig item: list) {
-            if (item.getAttributeId()   != null && item.getAttributeId().equals(attributeId)) {
+        for (HospitalConfig item : list) {
+            if (item.getAttributeId() != null && item.getAttributeId().equals(attributeId)) {
                 count++;
             }
         }
@@ -49,24 +54,43 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
     public HospitalConfigDTOGet updateAndGet(DtoUpdate<HospitalConfig, Long> entity) throws APIException {
         return super.updateAndGet(entity);
     }
-    @PostConstruct
-    private void post(){
-        HospitalConfigDTOCreate.setHospitalConfigSer(this);
-    }
 
     @Override
-    public HospitalConfig createEntry(BaseDtoCreate<HospitalConfig, Long> entity) throws APIException {
+    protected HospitalConfig createEntry(BaseDtoCreate<HospitalConfig, Long> entity) throws APIException {
         return super.createEntry(entity);
     }
 
     @Override
-    public Long update(DtoUpdate<HospitalConfig, Long> entity) throws APIException {
-        return super.update(entity);
+    protected HospitalConfig updateEntry(DtoUpdate<HospitalConfig, Long> entity) throws APIException {
+        return super.updateEntry(entity);
     }
 
     @Override
     public void deleteByID(Long id) throws APIException {
         super.deleteByID(id);
+    }
+
+    @Override
+    protected HospitalConfig validateAndUpdateEntry(DtoUpdate<HospitalConfig, Long> entity, HospitalConfig current) throws APIException {
+        if (entity instanceof HospitalConfigDTOUpdate) {
+            HospitalConfigDTOUpdate hospitalConfigDTOUpdate = (HospitalConfigDTOUpdate) entity;
+            if (validate(hospitalConfigDTOUpdate.converToHospitalConfig(), ((HospitalConfigDTOUpdate) entity).getAttributeId().equals(current.getAttributeId()))) {
+                return super.validateAndUpdateEntry(entity, current);
+            }
+
+        }
+        throw new IllegalArgumentException("Vuot qua so luong ConfigAttribute");
+    }
+
+
+    @Override
+    protected HospitalConfig validateAndCreateEntry(BaseDtoCreate<HospitalConfig, Long> entity) throws APIException {
+        if (entity instanceof HospitalConfigDTOCreate) {
+            if (validate(entity.toEntry(), false)) {
+                return super.validateAndCreateEntry(entity);
+            }
+        }
+        throw new IllegalArgumentException("Vuot qua so luong ConfigAttribute");
     }
 
     @Override
@@ -78,6 +102,53 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
 
     public HospitalConfigDTOGet getById(Long id) throws APIException {
         return super.getById(id);
+    }
+
+    public boolean validate(HospitalConfig hospitalConfig, boolean noUpdateAttribute) {
+        if (hospitalConfig == null) {
+            return false;
+        }
+        String attributeId;
+        attributeId = hospitalConfig.getAttributeId();
+        String attributeValue = hospitalConfig.getAttributeValue();
+        ConfigAttributeDTOGet configAttribute;
+        configAttribute = configAttributeService.getById(attributeId);
+        String type = configAttribute.getDatatype();
+        if (configAttributeService != null) {
+            if (type != null) {
+                if (type.equals("BOOLEAN")) {
+                    if (!(attributeValue.equals("true") || attributeValue.equals("false"))) {
+                        throw new IllegalArgumentException("ConfigAttribute co datatype la BOOLEAN nen attributeValue phai la true/false");
+                    }
+
+                } else if (type.equals("INTEGER")) {
+                    try {
+                        Integer.parseInt(attributeValue);
+                    } catch (NumberFormatException e) {
+                        throw new NumberFormatException("ConfigAttribute co datatype la INTEGER nen attributeValue phai la dang so nguyen");
+                    }
+                } else if (type.equals("FLOAT")) {
+                    try {
+                        Double.parseDouble(attributeValue);
+                    } catch (NumberFormatException e) {
+                        System.err.println("attributeValue phai la dang so thuc");
+                        throw new NumberFormatException("ConfigAttribute co datatype la FLOAT nen attributeValue phai la dang so thuc");
+                    }
+
+                }
+            }
+        }
+        attributeId = hospitalConfig.getAttributeId();
+        Integer maxOccurs = configAttribute.getMaxOccurs();;
+        if (noUpdateAttribute) {
+           return true;
+        }
+
+        if (this.findAllByAttributeId(attributeId) >= maxOccurs) {
+            System.err.println("Qua so luong cua ConfigAttribute");
+            return false;
+        }
+        return true;
     }
 
 }

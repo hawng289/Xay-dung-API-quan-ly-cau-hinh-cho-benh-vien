@@ -1,77 +1,67 @@
 package vn.itechcorp.admin.service.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import vn.com.itechcorp.base.service.dto.DtoUpdate;
 
 import vn.itechcorp.admin.service.ConfigAttributeService;
 
 import vn.itechcorp.admin.jpa.entity.HospitalConfig;
+import vn.itechcorp.admin.service.ConfigAttributeServiceImpl;
 import vn.itechcorp.admin.service.HospitalConfigService;
 
+import javax.persistence.Column;
+@NoArgsConstructor
+@Getter
+@Setter
 public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
     private String attributeId;
 
-    @NonNull
     private String attributeValue;
-    private ConfigAttributeService configAttributeService;
+    private static ConfigAttributeServiceImpl configAttributeService = null;
 
     private Boolean preferred;
 
-    @NonNull
     private String hospitalId;
 
-    private ConfigAttributeDTOGet configAttributeDTOGet = new ConfigAttributeDTOGet();
-    private HospitalConfigService hospitalConfigSer;
+    public HospitalConfigDTOUpdate(HospitalConfig hospitalConfig) {
+        super.setId(hospitalConfig.getId());
+        attributeValue = hospitalConfig.getAttributeValue();
+        preferred = hospitalConfig.getPreferred();
+        attributeId = hospitalConfig.getAttributeId();
+        hospitalId = hospitalConfig.getHospitalId();
+    }
+
+    public HospitalConfigDTOUpdate(Long id) {
+        super.setId(id);
+    }
+
+    public HospitalConfig converToHospitalConfig () {
+        return new HospitalConfig(getId(),attributeId,  attributeValue.trim().toLowerCase(), preferred, hospitalId);
+    }
 
     @Override
     public boolean apply(HospitalConfig hospitalConfig) {
 
         // Check null
-
-        if (hospitalId == null) {
-            return false;
+        if (hospitalId != null) {
+            hospitalConfig.setHospitalId(hospitalId);
+        } else {
+            return  false;
         }
 
-        if (preferred == null) {
+        if (preferred != null) {
             preferred = true;
+            hospitalConfig.setPreferred(preferred);
         }
 
         if (attributeValue != null) {
-            return false;
+            hospitalConfig.setAttributeValue(attributeValue);
         }
-        if (configAttributeService != null) {
-            ConfigAttributeDTOGet configAttribute = configAttributeService.getById(attributeId);
-            String type = configAttribute.getDatatype();
-            if (type != null) {
-                if (type.equals("BOOLEAN")) {
-                    if (attributeValue.trim().toLowerCase().equals("true")) {
-                        attributeValue = "true";
-                    } else {
-                        attributeValue = "false";
-                    }
-                }
-                if (type.equals("INT") || type.equals("INTEGER")) {
-                    try {
-                        attributeValue = Integer.parseInt(attributeValue) + "";
-                    } catch (NumberFormatException e) {
-                        System.err.println("attributeValue phai la dang int");
-                    }
-
-                }
-                if (type.equals("DOUBLE") || type.equals("FLOAT") || type.equals("REAL")) {
-                    try {
-                        attributeValue = Double.parseDouble(attributeValue) + "";
-                    } catch (NumberFormatException e) {
-                        System.err.println("attributeValue phai la dang so thuc");
-                    }
-
-                }
-            }
-            Integer maxOccurs = configAttribute.getMaxOccurs();
-            if (hospitalConfigSer.findAllByAttributeId(attributeId) >= maxOccurs) {
-                return false;
-            }
-
+        if (attributeId != null) {
+            hospitalConfig.setAttributeId(attributeId);
         }
         return true;
 

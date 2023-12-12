@@ -40,4 +40,11 @@ public class HospitalConfig extends BaseDbEntry<Long> {
         
     }
 
+    public HospitalConfig(Long aLong, String attributeId, String attributeValue, Boolean preferred, String hospitalId) {
+        super(aLong);
+        this.attributeId = attributeId;
+        this.attributeValue = attributeValue;
+        this.preferred = preferred;
+        this.hospitalId = hospitalId;
+    }
 }

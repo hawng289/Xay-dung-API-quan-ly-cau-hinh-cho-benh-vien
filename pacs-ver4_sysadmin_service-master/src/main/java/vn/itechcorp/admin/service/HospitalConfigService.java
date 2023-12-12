@@ -8,5 +8,7 @@ import vn.itechcorp.admin.jpa.entity.HospitalConfig;
 public interface HospitalConfigService extends BaseDtoService<HospitalConfigDTOGet, HospitalConfig, Long> {
     int findAllByAttributeId(String attributeId);
 
+
+
 }
 
