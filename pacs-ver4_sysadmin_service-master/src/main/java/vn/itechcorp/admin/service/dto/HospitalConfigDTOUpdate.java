@@ -45,25 +45,33 @@ public class HospitalConfigDTOUpdate extends DtoUpdate<HospitalConfig, Long> {
     @Override
     public boolean apply(HospitalConfig hospitalConfig) {
 
-        // Check null
-        if (hospitalId != null) {
+        if (hospitalId != null && !hospitalId.equals(hospitalConfig.getHospitalId())) {
             hospitalConfig.setHospitalId(hospitalId);
-        } else {
-            return  false;
+            return true;
         }
 
-        if (preferred != null) {
-            preferred = true;
+        if (preferred != null && !preferred.equals(hospitalConfig.getPreferred())) {
             hospitalConfig.setPreferred(preferred);
+            return true;
         }
 
-        if (attributeValue != null) {
-            hospitalConfig.setAttributeValue(attributeValue);
-        }
-        if (attributeId != null) {
+        if (attributeId != null && !attributeId.equals(hospitalConfig.getAttributeId())) {
             hospitalConfig.setAttributeId(attributeId);
+            if (attributeValue != null && !attributeValue.equals(hospitalConfig.getAttributeValue())) {
+                hospitalConfig.setAttributeValue(attributeValue);
+            }
+            return true;
         }
-        return true;
+
+        if (attributeValue != null && !attributeValue.equals(hospitalConfig.getAttributeValue())) {
+            hospitalConfig.setAttributeValue(attributeValue);
+            return true;
+        }
+
+
+
+        return false;
+
 
     }
 

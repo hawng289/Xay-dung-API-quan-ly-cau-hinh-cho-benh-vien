@@ -34,7 +34,7 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
     }
 
     @Override
-    public int findAllByAttributeId(String attributeId) {
+    public int findNumberAllByAttributeId(String attributeId) {
         List<HospitalConfig> list = hospitalConfigRepo.findAll();
         int count = 0;
         for (HospitalConfig item : list) {
@@ -72,8 +72,15 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
 
     @Override
     protected HospitalConfig validateAndUpdateEntry(DtoUpdate<HospitalConfig, Long> entity, HospitalConfig current) throws APIException {
+
         if (entity instanceof HospitalConfigDTOUpdate) {
             HospitalConfigDTOUpdate hospitalConfigDTOUpdate = (HospitalConfigDTOUpdate) entity;
+            if (hospitalConfigDTOUpdate.getAttributeId() == null) {
+                hospitalConfigDTOUpdate.setAttributeId(current.getAttributeId());
+            }
+            if (hospitalConfigDTOUpdate.getAttributeValue() == null) {
+                hospitalConfigDTOUpdate.setAttributeValue(current.getAttributeValue());
+            }
             if (validate(hospitalConfigDTOUpdate.converToHospitalConfig(), ((HospitalConfigDTOUpdate) entity).getAttributeId().equals(current.getAttributeId()))) {
                 return super.validateAndUpdateEntry(entity, current);
             }
@@ -114,28 +121,26 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
         ConfigAttributeDTOGet configAttribute;
         configAttribute = configAttributeService.getById(attributeId);
         String type = configAttribute.getDatatype();
-        if (configAttributeService != null) {
-            if (type != null) {
-                if (type.equals("BOOLEAN")) {
-                    if (!(attributeValue.equals("true") || attributeValue.equals("false"))) {
-                        throw new IllegalArgumentException("ConfigAttribute co datatype la BOOLEAN nen attributeValue phai la true/false");
-                    }
-
-                } else if (type.equals("INTEGER")) {
-                    try {
-                        Integer.parseInt(attributeValue);
-                    } catch (NumberFormatException e) {
-                        throw new NumberFormatException("ConfigAttribute co datatype la INTEGER nen attributeValue phai la dang so nguyen");
-                    }
-                } else if (type.equals("FLOAT")) {
-                    try {
-                        Double.parseDouble(attributeValue);
-                    } catch (NumberFormatException e) {
-                        System.err.println("attributeValue phai la dang so thuc");
-                        throw new NumberFormatException("ConfigAttribute co datatype la FLOAT nen attributeValue phai la dang so thuc");
-                    }
-
+        if (type != null) {
+            if (type.equals("BOOLEAN")) {
+                if (!(attributeValue.equals("true") || attributeValue.equals("false"))) {
+                    throw new IllegalArgumentException("ConfigAttribute co datatype la BOOLEAN nen attributeValue phai la true/false");
                 }
+
+            } else if (type.equals("INTEGER")) {
+                try {
+                    Integer.parseInt(attributeValue);
+                } catch (NumberFormatException e) {
+                    throw new NumberFormatException("ConfigAttribute co datatype la INTEGER nen attributeValue phai la dang so nguyen");
+                }
+            } else if (type.equals("FLOAT")) {
+                try {
+                    Double.parseDouble(attributeValue);
+                } catch (NumberFormatException e) {
+                    System.err.println("attributeValue phai la dang so thuc");
+                    throw new NumberFormatException("ConfigAttribute co datatype la FLOAT nen attributeValue phai la dang so thuc");
+                }
+
             }
         }
         attributeId = hospitalConfig.getAttributeId();
@@ -144,8 +149,7 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
            return true;
         }
 
-        if (this.findAllByAttributeId(attributeId) >= maxOccurs) {
-            System.err.println("Qua so luong cua ConfigAttribute");
+        if (this.findNumberAllByAttributeId(attributeId) >= maxOccurs) {
             return false;
         }
         return true;

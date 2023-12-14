@@ -21,7 +21,6 @@ public class HospitalConfigDTOGet extends DtoGet<HospitalConfig, Long> {
 
     public HospitalConfigDTOGet(HospitalConfig object) {
         super(object);
-        System.out.println(this);
     }
 
     @Override

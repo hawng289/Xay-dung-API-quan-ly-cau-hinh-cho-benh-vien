@@ -31,7 +31,7 @@ public class Controller {
 
 
     @PostMapping("/hospitalConfig")
-    public CompletableFuture<ResponseEntity<APIResponse<Long>>> createClient(
+    public CompletableFuture<ResponseEntity<APIResponse<Long>>> createHospitalConfig(
             @Valid @RequestBody HospitalConfigDTOCreate entity,
             Errors error) {
         if (error.hasErrors())
@@ -39,7 +39,7 @@ public class Controller {
         return hospitalConfigAPIMethod.createAsync(entity);
     }
     @GetMapping("/hospitalConfig")
-    public CompletableFuture<ResponseEntity<APIListResponse<List<HospitalConfigDTOGet>>>> getAllConfigAttributes(
+    public CompletableFuture<ResponseEntity<APIListResponse<List<HospitalConfigDTOGet>>>> getAllHospitalConfig(
             @RequestParam(required = false, name = "orderBy") String orderBy,
             @RequestParam(required = false, name = "offset", defaultValue = "0") int offset,
             @RequestParam(required = false, name = "limit", defaultValue = "100") int limit) {
@@ -48,7 +48,7 @@ public class Controller {
 
 
     @GetMapping("/hospitalConfig/{id}")
-    public CompletableFuture<ResponseEntity<APIResponse<HospitalConfigDTOGet>>> getHospitalById(
+    public CompletableFuture<ResponseEntity<APIResponse<HospitalConfigDTOGet>>> getHospitalConfigById(
             @PathVariable("id") Long id) {
         return hospitalConfigAPIMethod.getByIdAsync(id);
     }
@@ -56,7 +56,7 @@ public class Controller {
 
 
     @PutMapping("/hospitalConfig")
-    public CompletableFuture<ResponseEntity<APIResponse<Long>>> updateHospital(
+    public CompletableFuture<ResponseEntity<APIResponse<Long>>> updateHospitalConfig(
             @Valid @RequestBody HospitalConfigDTOUpdate entity,
             Errors error) {
         if (error.hasErrors())
@@ -66,7 +66,7 @@ public class Controller {
 
 
     @DeleteMapping("/hospitalConfig/{id}")
-    public CompletableFuture<ResponseEntity<APIResponse<Long>>> deleteHospitalByID(
+    public CompletableFuture<ResponseEntity<APIResponse<Long>>> deleteHospitalConfigByID(
             @PathVariable("id") Long id) {
         return hospitalConfigAPIMethod.deleteAsync(id);
     }

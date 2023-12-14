@@ -21,15 +21,20 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
     @NonNull
     private  String hospitalId;
 
+    public HospitalConfigDTOCreate(Long id, String attributeId, @NonNull String attributeValue, Boolean preferred, @NonNull String hospitalId) {
+        setId(id);
+        this.attributeId = attributeId;
+        this.attributeValue = attributeValue;
+        this.preferred = preferred;
+        this.hospitalId = hospitalId;
+    }
+
     @Override
     public HospitalConfig toEntry() {
         if (preferred == null) {
             preferred = true;
         }
 
-        if (attributeValue == null) {
-            return null;
-        }
 
         attributeValue = attributeValue.trim().toLowerCase();
 
@@ -39,7 +44,6 @@ public class HospitalConfigDTOCreate extends DtoCreate<HospitalConfig, Long> {
         object.setPreferred(preferred);
         object.setHospitalId(hospitalId);
         object.setAttributeValue(attributeValue);
-        System.out.println(object);
 
         return object;
     }
