@@ -2,12 +2,8 @@ package vn.itechcorp.admin.jpa.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.com.itechcorp.base.persistence.model.BaseDbEntry;
-import vn.com.itechcorp.base.persistence.model.BaseSerialIDEntry;
-
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;

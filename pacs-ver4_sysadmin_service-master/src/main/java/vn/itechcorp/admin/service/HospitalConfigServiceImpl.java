@@ -7,42 +7,39 @@ import vn.com.itechcorp.base.service.dto.BaseDtoCreate;
 import vn.com.itechcorp.base.service.dto.DtoUpdate;
 import vn.com.itechcorp.base.service.impl.BaseDtoJpaServiceImpl;
 
+import vn.itechcorp.admin.jpa.HospitalConfigRepository;
 import vn.itechcorp.admin.service.dto.ConfigAttributeDTOGet;
 import vn.itechcorp.admin.service.dto.HospitalConfigDTOCreate;
 import vn.itechcorp.admin.service.dto.HospitalConfigDTOGet;
 import vn.itechcorp.admin.jpa.entity.HospitalConfig;
-import vn.itechcorp.admin.jpa.HospitalConfigRepo;
+import vn.itechcorp.admin.jpa.HospitalConfigRepository;
 import vn.itechcorp.admin.service.dto.HospitalConfigDTOUpdate;
 
 import java.util.List;
 
-@Service("HospitalConfigSerImp")
-public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDTOGet, HospitalConfig, Long> implements HospitalConfigService {
+import static vn.itechcorp.admin.util.Util.isNumericFloat;
+import static vn.itechcorp.admin.util.Util.isNumericInteger;
 
-    private final HospitalConfigRepo hospitalConfigRepo;
+@Service("HospitalConfigServiceImp")
+public class HospitalConfigServiceImpl extends BaseDtoJpaServiceImpl<HospitalConfigDTOGet, HospitalConfig, Long> implements HospitalConfigService {
+
+    private final HospitalConfigRepository hospitalConfigRepository;
     @Autowired
     private final ConfigAttributeService configAttributeService;
 
-    public HospitalConfigSerImp(HospitalConfigRepo hospitalConfigRepo, ConfigAttributeServiceImpl configAttributeService) {
-        this.hospitalConfigRepo = hospitalConfigRepo;
+    public HospitalConfigServiceImpl(HospitalConfigRepository hospitalConfigRepo, ConfigAttributeServiceImpl configAttributeService) {
+        this.hospitalConfigRepository = hospitalConfigRepo;
         this.configAttributeService = configAttributeService;
     }
 
     @Override
-    public HospitalConfigRepo getRepository() {
-        return hospitalConfigRepo;
+    public HospitalConfigRepository getRepository() {
+        return hospitalConfigRepository;
     }
 
     @Override
-    public int findNumberAllByAttributeId(String attributeId) {
-        List<HospitalConfig> list = hospitalConfigRepo.findAll();
-        int count = 0;
-        for (HospitalConfig item : list) {
-            if (item.getAttributeId() != null && item.getAttributeId().equals(attributeId)) {
-                count++;
-            }
-        }
-        return count;
+    public int countByHospitalIdAndAttributeId(String hospitalId, String attributeId) {
+        return hospitalConfigRepository.countByHospitalIdAndAttributeId(hospitalId, attributeId);
     }
 
     @Override
@@ -80,6 +77,9 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
             }
             if (hospitalConfigDTOUpdate.getAttributeValue() == null) {
                 hospitalConfigDTOUpdate.setAttributeValue(current.getAttributeValue());
+            }
+            if (hospitalConfigDTOUpdate.getHospitalId() == null) {
+                hospitalConfigDTOUpdate.setHospitalId(current.getHospitalId());
             }
             if (validate(hospitalConfigDTOUpdate.converToHospitalConfig(), ((HospitalConfigDTOUpdate) entity).getAttributeId().equals(current.getAttributeId()))) {
                 return super.validateAndUpdateEntry(entity, current);
@@ -128,16 +128,12 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
                 }
 
             } else if (type.equals("INTEGER")) {
-                try {
-                    Integer.parseInt(attributeValue);
-                } catch (NumberFormatException e) {
+                if (!isNumericInteger(attributeValue)) {
                     throw new NumberFormatException("ConfigAttribute co datatype la INTEGER nen attributeValue phai la dang so nguyen");
                 }
+
             } else if (type.equals("FLOAT")) {
-                try {
-                    Double.parseDouble(attributeValue);
-                } catch (NumberFormatException e) {
-                    System.err.println("attributeValue phai la dang so thuc");
+                if (!isNumericFloat(attributeValue)) {
                     throw new NumberFormatException("ConfigAttribute co datatype la FLOAT nen attributeValue phai la dang so thuc");
                 }
 
@@ -149,7 +145,8 @@ public class HospitalConfigSerImp extends BaseDtoJpaServiceImpl<HospitalConfigDT
            return true;
         }
 
-        if (this.findNumberAllByAttributeId(attributeId) >= maxOccurs) {
+        String hositalId = hospitalConfig.getHospitalId();
+        if (this.countByHospitalIdAndAttributeId(hositalId, attributeId) >= maxOccurs) {
             return false;
         }
         return true;

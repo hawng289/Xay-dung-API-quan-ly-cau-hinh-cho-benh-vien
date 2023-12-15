@@ -9,6 +9,15 @@ import java.util.Base64;
 import java.util.Date;
 
 public class Util {
+    public static boolean isNumericInteger(String str) {
+        return str.matches("-?\\d+");  //match a number with optional '-' and decimal.
+    }
+
+    public static boolean isNumericFloat(String str) {
+        return str.matches("-?\\d+((\\.|,)\\d+)?");  //match a number with optional '-' and decimal.
+    }
+
+
 
     public static String byteToImageSrc(byte[] data) {
         if (data == null) return null;
